@@ -1,10 +1,10 @@
 const CACHE_NAME = 'moje-rostliny-v1';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/app.js',
-    '/manifest.json'
+    './',
+    './index.html',
+    './style.css',
+    './app.js',
+    './manifest.json'
 ];
 
 // Instalace service workeru
@@ -60,11 +60,11 @@ self.addEventListener('fetch', event => {
 self.addEventListener('push', event => {
     const options = {
         body: event.data ? event.data.text() : 'Některé rostliny potřebují zalít!',
-        icon: '/icons/icon.svg',
-        badge: '/icons/icon.svg',
+        icon: './icons/icon.svg',
+        badge: './icons/icon.svg',
         vibrate: [100, 50, 100],
         data: {
-            url: '/'
+            url: './'
         },
         actions: [
             { action: 'open', title: '🌿 Otevřít aplikaci' },
@@ -91,7 +91,7 @@ self.addEventListener('notificationclick', event => {
                 }
             }
             if (clients.openWindow) {
-                return clients.openWindow('/');
+                return clients.openWindow('./');
             }
         })
     );

@@ -689,7 +689,7 @@ setInterval(updateWateringAlert, 60000);
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
         try {
-            const registration = await navigator.serviceWorker.register('/sw.js');
+            const registration = await navigator.serviceWorker.register('./sw.js');
             console.log('Service Worker registrován:', registration.scope);
         } catch (error) {
             console.log('Service Worker registrace selhala:', error);

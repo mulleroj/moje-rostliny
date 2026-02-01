@@ -2,7 +2,7 @@
     "name": "Moje Rostliny - Péče o květiny",
     "short_name": "Moje Rostliny",
     "description": "Aplikace pro sledování zálivky a péči o pokojové rostliny",
-    "start_url": "/index.html",
+    "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#0d1f0d",
     "theme_color": "#065f46",
