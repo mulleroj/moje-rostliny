@@ -875,3 +875,55 @@ setTimeout(checkNotificationStatus, 2000);
 window.testNotification = () => {
     checkAndNotify();
 };
+
+// ============================================
+// QR Code Modal
+// ============================================
+
+const qrBtn = document.getElementById('qrBtn');
+const qrModal = document.getElementById('qrModal');
+const qrModalClose = document.getElementById('qrModalClose');
+const qrCodeContainer = document.getElementById('qrCode');
+
+// Generovat QR kód pomocí Google Charts API
+function generateQRCode() {
+    const appUrl = 'https://moje-rostliny.netlify.app';
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(appUrl)}&bgcolor=ffffff&color=0d1f0d&margin=10`;
+    
+    qrCodeContainer.innerHTML = `<img src="${qrApiUrl}" alt="QR kód pro stažení aplikace" />`;
+}
+
+// Otevřít QR modal
+function openQRModal() {
+    generateQRCode();
+    qrModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Zavřít QR modal
+function closeQRModal() {
+    qrModal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Event listenery
+if (qrBtn) {
+    qrBtn.addEventListener('click', openQRModal);
+}
+
+if (qrModalClose) {
+    qrModalClose.addEventListener('click', closeQRModal);
+}
+
+if (qrModal) {
+    qrModal.addEventListener('click', (e) => {
+        if (e.target === qrModal) closeQRModal();
+    });
+}
+
+// Zavřít i pomocí Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && qrModal.classList.contains('active')) {
+        closeQRModal();
+    }
+});
