@@ -882,6 +882,10 @@ body {
     .calendar-section.active {
         grid-template-columns: 1fr;
     }
+    
+    .calendar-section {
+        padding: 1rem;
+    }
 }
 
 .calendar-container {
@@ -889,6 +893,16 @@ body {
     border-radius: 20px;
     padding: 1.5rem;
     border: 1px solid var(--border-color);
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .calendar-container {
+        padding: 1rem 0.75rem;
+        border-radius: 16px;
+    }
 }
 
 .calendar-header {
@@ -914,6 +928,23 @@ body {
     font-size: 1.5rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+    .calendar-header {
+        margin-bottom: 1rem;
+    }
+    
+    .calendar-title {
+        font-size: 1.1rem;
+    }
+    
+    .calendar-nav {
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+    }
 }
 
 .calendar-nav:hover {
@@ -944,6 +975,20 @@ body {
     gap: 0.5rem;
 }
 
+@media (max-width: 480px) {
+    .calendar-grid {
+        gap: 0.25rem;
+    }
+    
+    .calendar-weekdays {
+        gap: 0.25rem;
+    }
+    
+    .calendar-weekdays span {
+        font-size: 0.7rem;
+    }
+}
+
 .calendar-day {
     aspect-ratio: 1;
     display: flex;
@@ -956,7 +1001,29 @@ body {
     transition: all 0.2s ease;
     border: 2px solid transparent;
     position: relative;
-    min-height: 50px;
+    min-height: 44px;
+    min-width: 0;
+}
+
+@media (max-width: 480px) {
+    .calendar-day {
+        border-radius: 8px;
+        border-width: 1px;
+        min-height: 38px;
+    }
+    
+    .calendar-day .day-number {
+        font-size: 0.85rem;
+    }
+    
+    .calendar-day .water-dot {
+        width: 4px;
+        height: 4px;
+    }
+    
+    .calendar-day .water-indicator {
+        margin-top: 2px;
+    }
 }
 
 .calendar-day:hover {
@@ -1020,6 +1087,7 @@ body {
     margin-top: 1.5rem;
     padding-top: 1rem;
     border-top: 1px solid var(--border-color);
+    flex-wrap: wrap;
 }
 
 .legend-item {
@@ -1028,6 +1096,23 @@ body {
     gap: 0.5rem;
     font-size: 0.8rem;
     color: var(--text-muted);
+}
+
+@media (max-width: 480px) {
+    .calendar-legend {
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+    
+    .legend-item {
+        font-size: 0.7rem;
+        gap: 0.3rem;
+    }
+    
+    .legend-dot {
+        width: 8px;
+        height: 8px;
+    }
 }
 
 .legend-dot {
