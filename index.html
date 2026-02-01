@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moje Rostliny 🌿</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Aplikace pro sledování zálivky a péči o pokojové rostliny">
+    <meta name="theme-color" content="#065f46">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Moje Rostliny">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+    <link rel="apple-touch-icon" href="icons/icon.svg">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🌱</span>
+                    <h1>Moje Rostliny</h1>
+                </div>
+                <p class="subtitle">Průvodce péčí o vaše zelené přátele</p>
+            </div>
+            <div class="header-decoration"></div>
+        </header>
+
+        <section class="watering-alert" id="wateringAlert">
+            <div class="alert-header">
+                <span class="alert-icon">🚿</span>
+                <h2>Čas na zálivku!</h2>
+            </div>
+            <div class="alert-plants" id="alertPlants">
+                <!-- Rostliny k zalití -->
+            </div>
+        </section>
+
+        <nav class="filter-nav">
+            <button class="filter-btn active" data-filter="all">Všechny</button>
+            <button class="filter-btn" data-filter="needs-water">🚿 Potřebují zalít</button>
+            <button class="filter-btn" data-filter="cat-safe">🐱 Pro kočky OK</button>
+            <button class="filter-btn" data-filter="cat-danger">⚠️ Pozor kočky</button>
+            <button class="filter-btn" data-filter="low-water">💧 Málo vody</button>
+            <button class="filter-btn" data-filter="medium-water">💧💧 Středně</button>
+            <button class="filter-btn" data-filter="high-water">💧💧💧 Hodně vody</button>
+        </nav>
+
+        <main class="plants-grid" id="plantsGrid">
+            <!-- Rostliny budou vloženy JavaScriptem -->
+        </main>
+
+        <div class="modal" id="plantModal">
+            <div class="modal-content">
+                <button class="modal-close" id="modalClose">&times;</button>
+                <div class="modal-body" id="modalBody">
+                    <!-- Detail rostliny -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Instalační banner -->
+        <div class="install-banner" id="installBanner">
+            <div class="install-content">
+                <span class="install-icon">📱</span>
+                <div class="install-text">
+                    <strong>Nainstalovat aplikaci</strong>
+                    <span>Přidejte si ji na plochu pro snadný přístup</span>
+                </div>
+            </div>
+            <div class="install-buttons">
+                <button class="install-btn" id="installBtn">Nainstalovat</button>
+                <button class="install-close" id="installClose">✕</button>
+            </div>
+        </div>
+
+        <!-- Notifikační banner -->
+        <div class="notification-banner" id="notificationBanner">
+            <div class="notification-content">
+                <span class="notification-icon">🔔</span>
+                <div class="notification-text">
+                    <strong>Povolit upozornění</strong>
+                    <span>Budeme vás informovat, kdy zalít rostliny</span>
+                </div>
+            </div>
+            <div class="notification-buttons">
+                <button class="notification-btn" id="notificationBtn">Povolit</button>
+                <button class="notification-close" id="notificationClose">✕</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

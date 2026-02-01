@@ -1,0 +1,26 @@
+{
+    "name": "Moje Rostliny - Péče o květiny",
+    "short_name": "Moje Rostliny",
+    "description": "Aplikace pro sledování zálivky a péči o pokojové rostliny",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "#0d1f0d",
+    "theme_color": "#065f46",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "icons/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/icon.svg",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "maskable"
+        }
+    ],
+    "categories": ["lifestyle", "utilities"],
+    "lang": "cs"
+}
