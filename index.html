@@ -57,7 +57,43 @@
             <button class="filter-btn" data-filter="low-water">💧 Málo vody</button>
             <button class="filter-btn" data-filter="medium-water">💧💧 Středně</button>
             <button class="filter-btn" data-filter="high-water">💧💧💧 Hodně vody</button>
+            <button class="filter-btn calendar-btn" id="calendarToggle">📅 Kalendář</button>
         </nav>
+
+        <!-- Kalendář zálivky -->
+        <section class="calendar-section" id="calendarSection">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="calendar-nav" id="prevMonth">‹</button>
+                    <h2 class="calendar-title" id="calendarTitle">Únor 2026</h2>
+                    <button class="calendar-nav" id="nextMonth">›</button>
+                </div>
+                <div class="calendar-weekdays">
+                    <span>Po</span>
+                    <span>Út</span>
+                    <span>St</span>
+                    <span>Čt</span>
+                    <span>Pá</span>
+                    <span>So</span>
+                    <span>Ne</span>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Dny kalendáře -->
+                </div>
+                <div class="calendar-legend">
+                    <span class="legend-item"><span class="legend-dot high"></span> 3+ rostlin</span>
+                    <span class="legend-item"><span class="legend-dot medium"></span> 1-2 rostliny</span>
+                    <span class="legend-item"><span class="legend-dot today"></span> Dnes</span>
+                </div>
+            </div>
+            
+            <div class="calendar-detail" id="calendarDetail">
+                <h3 id="detailDate">Vyberte den</h3>
+                <div class="detail-plants" id="detailPlants">
+                    <p class="detail-empty">Klikněte na den v kalendáři pro zobrazení plánovaných zálivek</p>
+                </div>
+            </div>
+        </section>
 
         <main class="plants-grid" id="plantsGrid">
             <!-- Rostliny budou vloženy JavaScriptem -->

@@ -877,6 +877,209 @@ window.testNotification = () => {
 };
 
 // ============================================
+// Kalendář zálivky
+// ============================================
+
+const calendarToggle = document.getElementById('calendarToggle');
+const calendarSection = document.getElementById('calendarSection');
+const calendarGrid = document.getElementById('calendarGrid');
+const calendarTitle = document.getElementById('calendarTitle');
+const prevMonthBtn = document.getElementById('prevMonth');
+const nextMonthBtn = document.getElementById('nextMonth');
+const detailDate = document.getElementById('detailDate');
+const detailPlants = document.getElementById('detailPlants');
+
+let currentCalendarDate = new Date();
+let selectedDate = null;
+
+const monthNames = [
+    'Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen',
+    'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'
+];
+
+const dayNames = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
+
+// Toggle kalendáře
+if (calendarToggle) {
+    calendarToggle.addEventListener('click', () => {
+        const isActive = calendarSection.classList.contains('active');
+        calendarSection.classList.toggle('active');
+        calendarToggle.classList.toggle('active');
+        
+        if (!isActive) {
+            renderCalendar();
+        }
+    });
+}
+
+// Navigace měsíců
+if (prevMonthBtn) {
+    prevMonthBtn.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        renderCalendar();
+    });
+}
+
+if (nextMonthBtn) {
+    nextMonthBtn.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        renderCalendar();
+    });
+}
+
+// Získat rostliny pro daný den
+function getPlantsForDate(date) {
+    const wateringData = loadWateringData();
+    const targetDate = new Date(date);
+    targetDate.setHours(0, 0, 0, 0);
+    
+    return plants.filter(plant => {
+        const lastWatered = new Date(wateringData[plant.id]?.lastWatered || new Date());
+        const intervalDays = getWateringDays(plant.waterFrequency);
+        
+        // Vypočítat všechna data zálivky od poslední zálivky
+        let nextWatering = new Date(lastWatered);
+        nextWatering.setHours(0, 0, 0, 0);
+        
+        // Projít všechna možná data zálivky
+        for (let i = 0; i < 100; i++) {
+            nextWatering.setDate(lastWatered.getDate() + (intervalDays * (i + 1)));
+            
+            if (nextWatering.getTime() === targetDate.getTime()) {
+                return true;
+            }
+            
+            if (nextWatering > targetDate) {
+                break;
+            }
+        }
+        
+        return false;
+    });
+}
+
+// Render kalendáře
+function renderCalendar() {
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    
+    calendarTitle.textContent = `${monthNames[month]} ${year}`;
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDay = (firstDay.getDay() + 6) % 7; // Pondělí = 0
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let html = '';
+    
+    // Dny z předchozího měsíce
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    for (let i = startDay - 1; i >= 0; i--) {
+        const day = prevMonthLastDay - i;
+        const date = new Date(year, month - 1, day);
+        html += renderCalendarDay(date, true);
+    }
+    
+    // Dny aktuálního měsíce
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+        const date = new Date(year, month, day);
+        const isToday = date.getTime() === today.getTime();
+        const isSelected = selectedDate && date.getTime() === selectedDate.getTime();
+        html += renderCalendarDay(date, false, isToday, isSelected);
+    }
+    
+    // Dny následujícího měsíce
+    const totalCells = Math.ceil((startDay + lastDay.getDate()) / 7) * 7;
+    const remainingCells = totalCells - (startDay + lastDay.getDate());
+    for (let day = 1; day <= remainingCells; day++) {
+        const date = new Date(year, month + 1, day);
+        html += renderCalendarDay(date, true);
+    }
+    
+    calendarGrid.innerHTML = html;
+    
+    // Event listenery pro dny
+    document.querySelectorAll('.calendar-day').forEach(dayEl => {
+        dayEl.addEventListener('click', () => {
+            const dateStr = dayEl.dataset.date;
+            selectDate(new Date(dateStr));
+        });
+    });
+}
+
+// Render jednoho dne
+function renderCalendarDay(date, isOtherMonth, isToday = false, isSelected = false) {
+    const plantsForDay = getPlantsForDate(date);
+    const count = plantsForDay.length;
+    const dateStr = date.toISOString().split('T')[0];
+    
+    let classes = 'calendar-day';
+    if (isOtherMonth) classes += ' other-month';
+    if (isToday) classes += ' today';
+    if (isSelected) classes += ' selected';
+    if (count > 2) classes += ' has-many';
+    
+    let dotsHtml = '';
+    if (count > 0) {
+        if (count <= 3) {
+            dotsHtml = '<div class="water-indicator">' + 
+                Array(count).fill('<span class="water-dot"></span>').join('') + 
+                '</div>';
+        } else {
+            dotsHtml = `<div class="water-indicator" data-count="+${count}">
+                <span class="water-dot many"></span>
+                <span class="water-dot many"></span>
+                <span class="water-dot many"></span>
+            </div>`;
+        }
+    }
+    
+    return `
+        <div class="${classes}" data-date="${dateStr}">
+            <span class="day-number">${date.getDate()}</span>
+            ${dotsHtml}
+        </div>
+    `;
+}
+
+// Vybrat datum a zobrazit detail
+function selectDate(date) {
+    selectedDate = date;
+    renderCalendar();
+    
+    const dayName = dayNames[date.getDay()];
+    const day = date.getDate();
+    const month = monthNames[date.getMonth()];
+    
+    detailDate.textContent = `${dayName} ${day}. ${month}`;
+    
+    const plantsForDay = getPlantsForDate(date);
+    
+    if (plantsForDay.length === 0) {
+        detailPlants.innerHTML = `
+            <div class="detail-no-watering">
+                <div class="icon">✨</div>
+                <p>Žádné zálivky na tento den</p>
+            </div>
+        `;
+        return;
+    }
+    
+    detailPlants.innerHTML = plantsForDay.map(plant => `
+        <div class="detail-plant" onclick="openModal(${plant.id})">
+            <img src="${plant.image}" alt="${plant.name}">
+            <div class="detail-plant-info">
+                <div class="detail-plant-name">${plant.name}</div>
+                <div class="detail-plant-freq">${plant.waterFrequency}</div>
+            </div>
+            <button class="water-btn-small" onclick="event.stopPropagation(); waterPlant(${plant.id})" title="Zalít">💧</button>
+        </div>
+    `).join('');
+}
+
+// ============================================
 // QR Code Modal
 // ============================================
 
