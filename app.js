@@ -930,32 +930,103 @@ if (nextMonthBtn) {
 // Získat rostliny pro daný den
 function getPlantsForDate(date) {
     const wateringData = loadWateringData();
-    const targetDate = new Date(date);
-    targetDate.setHours(0, 0, 0, 0);
+    const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     
     return plants.filter(plant => {
-        const lastWatered = new Date(wateringData[plant.id]?.lastWatered || new Date());
+        const lastWateredStr = wateringData[plant.id]?.lastWatered;
+        if (!lastWateredStr) return false;
+        
+        const parts = lastWateredStr.split('-');
+        const lastWatered = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
         const intervalDays = getWateringDays(plant.waterFrequency);
         
-        // Vypočítat všechna data zálivky od poslední zálivky
-        let nextWatering = new Date(lastWatered);
-        nextWatering.setHours(0, 0, 0, 0);
+        // Počet dní od poslední zálivky do cílového data
+        const diffTime = targetDate.getTime() - lastWatered.getTime();
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
         
-        // Projít všechna možná data zálivky
-        for (let i = 0; i < 100; i++) {
-            nextWatering.setDate(lastWatered.getDate() + (intervalDays * (i + 1)));
-            
-            if (nextWatering.getTime() === targetDate.getTime()) {
-                return true;
-            }
-            
-            if (nextWatering > targetDate) {
-                break;
-            }
+        // Pokud je rozdíl záporný (datum před poslední zálivkou), není zálivka
+        if (diffDays <= 0) return false;
+        
+        // Zkontrolovat, zda cílový den odpovídá intervalu zálivky
+        // Rostlina potřebuje zalít každých X dní, tedy v den X, 2X, 3X, atd.
+        return diffDays % intervalDays === 0;
+    });
+}
+
+// Spočítat zálivky pro týden
+function getWeekWateringCount(startDate) {
+    let count = 0;
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + i);
+        count += getPlantsForDate(date).length;
+    }
+    return count;
+}
+
+// Render týdenního přehledu
+function renderWeeklySummary() {
+    const weeklySummary = document.getElementById('weeklySummary');
+    if (!weeklySummary) return;
+    
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    
+    // Najít první pondělí měsíce nebo před ním
+    const firstDay = new Date(year, month, 1);
+    const startOffset = (firstDay.getDay() + 6) % 7; // Kolik dní zpět do pondělí
+    const firstMonday = new Date(year, month, 1 - startOffset);
+    
+    // Spočítat 5-6 týdnů
+    const weeks = [];
+    let currentMonday = new Date(firstMonday);
+    
+    for (let w = 0; w < 6; w++) {
+        const weekEnd = new Date(currentMonday.getFullYear(), currentMonday.getMonth(), currentMonday.getDate() + 6);
+        
+        // Přeskočit týdny, které jsou úplně mimo aktuální měsíc
+        if (currentMonday.getMonth() > month && currentMonday.getFullYear() >= year) break;
+        if (weekEnd.getMonth() < month && weekEnd.getFullYear() <= year) {
+            currentMonday = new Date(currentMonday.getFullYear(), currentMonday.getMonth(), currentMonday.getDate() + 7);
+            continue;
         }
         
-        return false;
-    });
+        const count = getWeekWateringCount(currentMonday);
+        const startDay = currentMonday.getDate();
+        const startMonth = currentMonday.getMonth();
+        const endDay = weekEnd.getDate();
+        const endMonth = weekEnd.getMonth();
+        
+        let label;
+        if (startMonth === endMonth) {
+            label = `${startDay}.-${endDay}. ${monthNames[startMonth].slice(0, 3)}`;
+        } else {
+            label = `${startDay}. ${monthNames[startMonth].slice(0, 3)} - ${endDay}. ${monthNames[endMonth].slice(0, 3)}`;
+        }
+        
+        weeks.push({ label, count });
+        currentMonday = new Date(currentMonday.getFullYear(), currentMonday.getMonth(), currentMonday.getDate() + 7);
+    }
+    
+    const maxCount = Math.max(...weeks.map(w => w.count), 1);
+    
+    weeklySummary.innerHTML = `
+        <h4>📊 Týdenní přehled zálivek</h4>
+        <div class="week-bars">
+            ${weeks.map(week => {
+                const percentage = (week.count / maxCount) * 100;
+                const isHigh = week.count > maxCount * 0.8;
+                return `
+                    <div class="week-bar">
+                        <span class="week-label">${week.label}</span>
+                        <div class="week-bar-container">
+                            <div class="week-bar-fill ${isHigh ? 'high' : ''}" style="width: ${percentage}%"></div>
+                        </div>
+                        <span class="week-count">${week.count}×</span>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
 }
 
 // Render kalendáře
@@ -1010,6 +1081,9 @@ function renderCalendar() {
             selectDate(localDate);
         });
     });
+    
+    // Render týdenního přehledu
+    renderWeeklySummary();
 }
 
 // Render jednoho dne
