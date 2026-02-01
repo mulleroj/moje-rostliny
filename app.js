@@ -1004,7 +1004,10 @@ function renderCalendar() {
     document.querySelectorAll('.calendar-day').forEach(dayEl => {
         dayEl.addEventListener('click', () => {
             const dateStr = dayEl.dataset.date;
-            selectDate(new Date(dateStr));
+            // Parsovat datum správně v lokální časové zóně
+            const parts = dateStr.split('-');
+            const localDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            selectDate(localDate);
         });
     });
 }
@@ -1013,7 +1016,11 @@ function renderCalendar() {
 function renderCalendarDay(date, isOtherMonth, isToday = false, isSelected = false) {
     const plantsForDay = getPlantsForDate(date);
     const count = plantsForDay.length;
-    const dateStr = date.toISOString().split('T')[0];
+    // Formátovat datum bez použití toISOString (které převádí na UTC)
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
     
     let classes = 'calendar-day';
     if (isOtherMonth) classes += ' other-month';
@@ -1046,16 +1053,18 @@ function renderCalendarDay(date, isOtherMonth, isToday = false, isSelected = fal
 
 // Vybrat datum a zobrazit detail
 function selectDate(date) {
-    selectedDate = date;
+    // Oprava časové zóny - vytvořit datum v lokálním čase
+    const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    selectedDate = localDate;
     renderCalendar();
     
-    const dayName = dayNames[date.getDay()];
-    const day = date.getDate();
-    const month = monthNames[date.getMonth()];
+    const dayName = dayNames[localDate.getDay()];
+    const day = localDate.getDate();
+    const month = monthNames[localDate.getMonth()];
     
     detailDate.textContent = `${dayName} ${day}. ${month}`;
     
-    const plantsForDay = getPlantsForDate(date);
+    const plantsForDay = getPlantsForDate(localDate);
     
     if (plantsForDay.length === 0) {
         detailPlants.innerHTML = `
